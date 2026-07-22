@@ -1,19 +1,22 @@
-/* eslint-disable @n8n/community-nodes/node-usable-as-tool -- Picnode uploads require binary data, which AI tools cannot pass. */
+/* eslint-disable @n8n/community-nodes/node-usable-as-tool, n8n-nodes-base/node-execute-block-wrong-error-thrown -- Picnode uploads require binary data, and the class must load before n8n's runtime modules are resolvable in isolated Docker community-package directories. */
 import type {
 	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	JsonObject,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 import { picnodeApiRequest } from './GenericFunctions';
 
 function errorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
+}
+
+function rethrow(error: unknown): never {
+	if (error instanceof Error) throw error;
+	throw new Error(String(error));
 }
 
 export class Picnode implements INodeType {
@@ -125,7 +128,7 @@ export class Picnode implements INodeType {
 				};
 
 				if (!Array.isArray(response.files)) {
-					throw new NodeOperationError(this.getNode(), 'Picnode returned an invalid file list');
+					throw new Error('Picnode returned an invalid file list');
 				}
 
 				return [
@@ -139,17 +142,7 @@ export class Picnode implements INodeType {
 					return [[{ json: { error: errorMessage(error) }, pairedItem: { item: 0 } }]];
 				}
 
-				if (error instanceof NodeOperationError) {
-					throw new NodeOperationError(this.getNode(), error, { itemIndex: 0 });
-				}
-
-				if (error instanceof NodeApiError) {
-					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, {
-						itemIndex: 0,
-					});
-				}
-
-				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: 0 });
+				rethrow(error);
 			}
 		}
 
@@ -163,9 +156,7 @@ export class Picnode implements INodeType {
 					const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName);
 
 					if (!binaryData.mimeType) {
-						throw new NodeOperationError(this.getNode(), 'The binary file has no MIME type', {
-							itemIndex,
-						});
+						throw new Error('The binary file has no MIME type');
 					}
 
 					const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
@@ -188,9 +179,7 @@ export class Picnode implements INodeType {
 					const fileId = (this.getNodeParameter('fileId', itemIndex) as string).trim();
 
 					if (fileId.length === 0) {
-						throw new NodeOperationError(this.getNode(), 'File ID must not be empty', {
-							itemIndex,
-						});
+						throw new Error('File ID must not be empty');
 					}
 
 					const response = (await picnodeApiRequest.call(
@@ -204,9 +193,7 @@ export class Picnode implements INodeType {
 						pairedItem: { item: itemIndex },
 					});
 				} else {
-					throw new NodeOperationError(this.getNode(), `Unsupported operation: ${operation}`, {
-						itemIndex,
-					});
+					throw new Error(`Unsupported operation: ${operation}`);
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
@@ -217,15 +204,7 @@ export class Picnode implements INodeType {
 					continue;
 				}
 
-				if (error instanceof NodeOperationError) {
-					throw new NodeOperationError(this.getNode(), error, { itemIndex });
-				}
-
-				if (error instanceof NodeApiError) {
-					throw new NodeApiError(this.getNode(), error as unknown as JsonObject, { itemIndex });
-				}
-
-				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex });
+				rethrow(error);
 			}
 		}
 

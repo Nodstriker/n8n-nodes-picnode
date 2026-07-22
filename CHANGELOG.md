@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 - 2026-07-21
+
+### Fixed
+
+- Remove runtime imports from the node class so Docker community-package loading does not depend on the container's module layout.
+
 ## 0.1.1 - 2026-07-21
 
 ### Fixed

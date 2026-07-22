@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-picnode",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "An n8n community node for temporarily hosting images and videos with Picnode.",
 	"license": "MIT",
 	"homepage": "https://github.com/Nodstriker/n8n-nodes-picnode#readme",

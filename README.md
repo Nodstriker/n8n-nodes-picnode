@@ -50,5 +50,6 @@ The upstream binary must include a MIME type. Picnode validates the MIME type, f
 
 ## Version history
 
+- **0.1.2**: Remove runtime module-resolution requirements during Docker installation.
 - **0.1.1**: Improve compatibility with n8n's isolated community-node loader.
 - **0.1.0**: Initial release with Upload, List, and Delete operations.

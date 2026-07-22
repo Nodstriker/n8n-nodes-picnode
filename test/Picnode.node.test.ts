@@ -6,7 +6,6 @@ import type {
 	INode,
 	INodeExecutionData,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
 // Test-only dependency; it is not included in the published package.
 // eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
 import { describe, expect, it, vi } from 'vitest';
@@ -61,9 +60,7 @@ function createContext(options: ContextOptions) {
 			assertBinaryData: (itemIndex: number, propertyName: string): IBinaryData => {
 				const binary = items[itemIndex]?.binary?.[propertyName];
 				if (!binary) {
-					throw new NodeOperationError(testNode, `Missing binary field: ${propertyName}`, {
-						itemIndex,
-					});
+					throw new Error(`Missing binary field: ${propertyName}`);
 				}
 				return binary;
 			},
@@ -156,7 +153,9 @@ describe('Picnode node', () => {
 	it('rejects an invalid list response', async () => {
 		const { context } = createContext({ operation: 'list', response: { unexpected: true } });
 
-		await expect(new Picnode().execute.call(context)).rejects.toBeInstanceOf(NodeOperationError);
+		await expect(new Picnode().execute.call(context)).rejects.toThrow(
+			'Picnode returned an invalid file list',
+		);
 	});
 
 	it('returns an error item when Continue On Fail is enabled', async () => {
