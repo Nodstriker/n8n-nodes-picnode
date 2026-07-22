@@ -6,8 +6,9 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 	JsonObject,
+	NodeConnectionType,
 } from 'n8n-workflow';
-import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 import { picnodeApiRequest } from './GenericFunctions';
 
@@ -27,8 +28,8 @@ export class Picnode implements INodeType {
 		defaults: {
 			name: 'Picnode',
 		},
-		inputs: [NodeConnectionTypes.Main],
-		outputs: [NodeConnectionTypes.Main],
+		inputs: ['main' as NodeConnectionType],
+		outputs: ['main' as NodeConnectionType],
 		credentials: [
 			{
 				name: 'picnodeApi',

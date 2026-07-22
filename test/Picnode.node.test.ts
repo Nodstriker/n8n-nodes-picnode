@@ -76,6 +76,13 @@ function createContext(options: ContextOptions) {
 }
 
 describe('Picnode node', () => {
+	it('declares main connections without a runtime enum dependency', () => {
+		const node = new Picnode();
+
+		expect(node.description.inputs).toEqual(['main']);
+		expect(node.description.outputs).toEqual(['main']);
+	});
+
 	it('uploads each binary item as multipart form data', async () => {
 		const bytes = Buffer.from('image-content');
 		const { context, requests, request } = createContext({
