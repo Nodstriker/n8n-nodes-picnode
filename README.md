@@ -35,7 +35,7 @@ The credential sends the key in the `X-API-Key` request header.
 
 ## Compatibility
 
-Tested against n8n 2.65.1. The package uses the current n8n community-node API and requires a self-hosted n8n version that supports `@n8n/node-cli` community packages.
+Tested locally with n8n 2.31.4 and prepared for installation on n8n 2.30.8. The package uses the current n8n community-node API and requires a self-hosted n8n version that supports community packages.
 
 ## Usage
 
